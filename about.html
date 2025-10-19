@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quà tặng cho Em Yêu 💖</title>
+<style>
+  body {
+    background: linear-gradient(135deg, #ffd1dc, #fff0f5);
+    font-family: 'Comic Sans MS', cursive;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+  }
+
+  h1 {
+    color: #e91e63;
+    font-size: 2em;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px #fff;
+  }
+
+  .gift-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 25px;
+    margin-bottom: 30px;
+  }
+
+  .gift {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+
+  .gift img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.4s;
+  }
+
+  .gift.opened img.box {
+    opacity: 0;
+  }
+
+  .gift .gift-img {
+    display: none;
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(255, 105, 180, 0.6);
+    animation: popIn 0.8s ease-in-out;
+  }
+
+  .gift.opened .gift-img {
+    display: block;
+  }
+
+  .gift .name {
+    display: none;
+    margin-top: 10px;
+    font-size: 0.95em;
+    color: #d81b60;
+    font-weight: bold;
+  }
+
+  .gift.opened .name {
+    display: block;
+  }
+
+  .gift.shake {
+    animation: shake 0.4s;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(8deg); }
+    50% { transform: rotate(-8deg); }
+    75% { transform: rotate(8deg); }
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .heart {
+    position: absolute;
+    color: #ff1493;
+    animation: float 1s ease-in-out forwards;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  @keyframes float {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(-60px) scale(1.5); }
+  }
+
+  .message {
+    font-size: 1.2em;
+    color: #d81b60;
+    margin-bottom: 15px;
+  }
+
+  .reset-btn {
+    background-color: #ff69b4;
+    border: none;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .reset-btn:hover {
+    background-color: #e91e63;
+  }
+</style>
+</head>
+<body>
+
+<h1>💖 Quà tặng cho Em Yêu nhân ngày 20/10 💖</h1>
+
+<div class="gift-container" id="giftContainer"></div>
+
+<p class="message" id="message"></p>
+<button class="reset-btn" onclick="resetGame()">🔁 Chơi lại</button>
+
+<!-- Nhạc nền & âm thanh -->
+<audio id="bgMusic" src="https://cdn.pixabay.com/download/audio/2023/02/07/audio_d442e8a9b7.mp3" loop></audio>
+<audio id="popSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_45a0f66efb.mp3"></audio>
+
+<script>
+const gifts = [
+  { name: "Voucher 100k", img: "https://cdn-icons-png.flaticon.com/512/3500/3500833.png" },
+  { name: "Áo phông dưới 200k", img: "https://cdn-icons-png.flaticon.com/512/892/892458.png" },
+  { name: "Chiếc quần dưới 300k", img: "https://cdn-icons-png.flaticon.com/512/892/892477.png" },
+  { name: "Bộ đồ set voucher 500k", img: "https://cdn-icons-png.flaticon.com/512/892/892476.png" },
+  { name: "Đi nail & gội đầu", img: "https://cdn-icons-png.flaticon.com/512/3407/3407032.png" }
+];
+
+const giftBoxImg = "https://cdn-icons-png.flaticon.com/512/3081/3081559.png";
+const container = document.getElementById("giftContainer");
+const message = document.getElementById("message");
+const bgMusic = document.getElementById("bgMusic");
+const popSound = document.getElementById("popSound");
+
+let openedCount = 0;
+let musicStarted = false;
+
+function startMusic() {
+  if (!musicStarted) {
+    bgMusic.play().catch(() => {});
+    musicStarted = true;
+  }
+}
+
+function createGifts() {
+  container.innerHTML = "";
+  gifts.forEach(giftData => {
+    const gift = document.createElement("div");
+    gift.className = "gift";
+    gift.innerHTML = `
+      <img class="box" src="${giftBoxImg}" alt="Gift Box">
+      <img class="gift-img" src="${giftData.img}" alt="${giftData.name}">
+      <div class="name">${giftData.name}</div>
+    `;
+    gift.addEventListener("click", () => openGift(gift));
+    container.appendChild(gift);
+  });
+}
+
+function openGift(gift) {
+  startMusic();
+
+  if (gift.classList.contains("opened")) return;
+  if (openedCount >= 2) {
+    message.textContent = "Hết lượt chọn 😘";
+    return;
+  }
+
+  gift.classList.add("shake");
+  setTimeout(() => {
+    gift.classList.remove("shake");
+    gift.classList.add("opened");
+    popSound.currentTime = 0;
+    popSound.play();
+
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.innerHTML = "💖";
+    gift.appendChild(heart);
+    setTimeout(() => heart.remove(), 1000);
+  }, 400);
+
+  openedCount++;
+  if (openedCount === 2) {
+    message.textContent = "Em đã mở hết 2 món quà 🎁💞";
+  }
+}
+
+function resetGame() {
+  openedCount = 0;
+  message.textContent = "";
+  createGifts();
+}
+
+createGifts();
+</script>
+
+</body>
+</html>
